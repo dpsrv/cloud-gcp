@@ -37,4 +37,5 @@ ssh dpsrv@dpsrv-$env bash <<_EOT_
 		fi
 	done
 
+	docker network ls|grep -q dpsrv || docker network create dpsrv
 _EOT_
