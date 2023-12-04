@@ -99,5 +99,7 @@ resource "google_compute_firewall" "dpsrv" {
 		protocol	= "tcp"
 		ports		= [ "22", "53", "80", "443" ]
 	}
+
+	source_tags = [ "dpsrv" ]
 }
 
