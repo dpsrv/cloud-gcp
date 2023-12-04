@@ -7,6 +7,7 @@ if [ -z "$env" ]; then
 	exit 1
 fi
 
-ip=$(ip.sh $env)
+SWD=$(cd $(dirname $0); pwd)
+ip=$($SWD/ip.sh $env)
 
 ssh -i secrets/ssh/id_rsa dpsrv@$ip

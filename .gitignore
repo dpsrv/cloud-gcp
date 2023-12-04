@@ -1,2 +1,3 @@
+secrets/gcloud/logs/
 terraform/.terraform/
-terraform/secrets/gcloud/logs/
+terraform/state/*.backup

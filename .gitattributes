@@ -1,3 +1,3 @@
-terraform/secrets/** filter=openssl diff=openssl
+secrets/** filter=openssl diff=openssl
 terraform/state/** filter=openssl diff=openssl
 .gitattributes !filter !diff

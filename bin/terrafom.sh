@@ -1,6 +1,6 @@
 #!/opt/local/bin/bash -e
 
-cd $(dirname $0)
+cd $(dirname $0)/../terraform
 
 action=$1
 env=$2
