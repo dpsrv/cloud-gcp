@@ -1,6 +1,6 @@
 #!/opt/local/bin/bash -ex
 
-SWD=$(cd $(dirname $0); pwd)
+cd $(dirname $0)
 
 action=$1
 env=$2
@@ -13,7 +13,7 @@ shift 2
 
 function terraform() {
 	docker run -it \
-		-v $SWD/:/app \
+		-v $PWD/:/app \
 		-w /app \
 		-e GOOGLE_APPLICATION_CREDENTIALS=secrets/gcloud/application_default_credentials.json \
 		hashicorp/terraform:1.6 \
@@ -37,12 +37,12 @@ for TFVARS_FILE_NAME in ${TFVARS[@]}; do
 done
 
 [ -f secrets/ssh/id_rsa ] || ssh-keygen -t rsa -b 4096 -q -N "" -C "$LOGNAME@$HOSTNAME" -f secrets/ssh/id_rsa
-[ -d secrets/gcloud ] || $SWD/gcloud.sh auth login
+[ -d secrets/gcloud ] || $PWD/gcloud.sh auth login
 
 [ -d .terraform ] || terraform init
 terraform $action $TFSTATE_FILE ${TFVARS_FILES[@]} "$@"
 
-exit
-	--entrypoint ash \
-	--entrypoint ash \
-	#-u $(id -u):$(id -g) \
+if git status state/$env.tfstate|grep -q modified; then
+	git commit -m updated state/$env.tfstate
+	git push
+fi

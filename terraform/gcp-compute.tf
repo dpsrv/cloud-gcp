@@ -54,18 +54,20 @@ if ! blkid /dev/sdb; then
 	mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb && mount -o discard,defaults /dev/sdb /mnt/disks/data
 	mount -o discard,defaults /dev/sdb /mnt/disks/data
 	chown -R dpsrv:dpsrv /mnt/disks/data
-
-	mkdir /mnt/disks/data/opt
-	cd /mnt/disks/data/opt
-
-		git clone https://github.com/maxfortun/docker-scripts.git
-
-	cd -
 fi
 
 if ! grep -qs '/mnt/disks/data ' /proc/mounts; then
 	echo "Mounting disk"
 	mount -o discard,defaults /dev/sdb /mnt/disks/data
+fi
+
+if [ ! -d /mnt/disks/data/opt ]; then
+	mkdir /mnt/disks/data/opt
+	cd /mnt/disks/data/opt
+
+	git clone https://github.com/maxfortun/docker-scripts.git
+
+	cd $OLDPWD
 fi
 
 echo 'export PATH="$PATH:/mnt/disks/data/opt/docker-scripts"' >> ~dpsrv/.bashrc
