@@ -15,6 +15,7 @@ function terraform() {
 	docker run -it \
 		-v $SWD/:/app \
 		-w /app \
+		-e GOOGLE_APPLICATION_CREDENTIALS=secrets/gcloud/application_default_credentials.json \
 		hashicorp/terraform:1.6 \
 		"$@"
 }
@@ -36,6 +37,8 @@ for TFVARS_FILE_NAME in ${TFVARS[@]}; do
 done
 
 [ -f secrets/ssh/id_rsa ] || ssh-keygen -t rsa -b 4096 -q -N "" -C "$LOGNAME@$HOSTNAME" -f secrets/ssh/id_rsa
+[ -d secrets/gcloud ] || docker run -it -v secrets/gcloud/:/root/.config/gcloud/ gcr.io/google.com/cloudsdktool/google-cloud-cli:alpine gcloud auth application-default login
+
 [ -d .terraform ] || terraform init
 terraform $action $TFSTATE_FILE ${TFVARS_FILES[@]} "$@"
 
