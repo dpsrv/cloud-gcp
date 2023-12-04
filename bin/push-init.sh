@@ -17,7 +17,12 @@ scp -r ~/.config/git/ dpsrv@dpsrv-$env:.config/
 ssh dpsrv@dpsrv-$env bash <<_EOT_
 
 	cd /mnt/disks/data/opt
-	[ -d git-openssl-secrets ] || git clone https://github.com/maxfortun/git-openssl-secrets.git
+	if [ ! -d git-openssl-secrets ]; then
+		git clone https://github.com/maxfortun/git-openssl-secrets.git
+		cd git-openssl-secrets
+		ln -s git-setenv-openssl-secrets-fs.sh git-setenv-openssl-secrets.sh
+		cd $OLDPWD
+	fi
 
 	[ -d dpsrv ] || mkdir dpsrv
 	cd dpsrv
@@ -26,8 +31,9 @@ ssh dpsrv@dpsrv-$env bash <<_EOT_
 		[ ! -d $repo ] || continue
 		git clone https://github.com/dpsrv/$repo.git 
 		if grep -q openssl $repo/.gitattributes; then
-			/mnt/disks/data/opt/git-openssl-secret/git-init-openssl-secrets.sh
 			cd $repo
+			/mnt/disks/data/opt/git-openssl-secret/git-init-openssl-secrets.sh
+			cd $OLDPWD
 		fi
 	done
 
