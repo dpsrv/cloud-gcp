@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 env=$1
 if [ -z "$env" ]; then
@@ -7,6 +7,6 @@ if [ -z "$env" ]; then
 	exit 1
 fi
 
-ip=$(jq -r '.resources[] | select(.type == "google_compute_instance" and.name == "dpsrv").instances[].attributes.network_interface[].access_config[].nat_ip' state/$env.tfstate)
+ip=$(ip.sh $env)
 
 ssh -i secrets/ssh/id_rsa dpsrv@$ip

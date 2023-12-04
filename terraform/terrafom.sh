@@ -1,4 +1,4 @@
-#!/opt/local/bin/bash -ex
+#!/opt/local/bin/bash -e
 
 cd $(dirname $0)
 
