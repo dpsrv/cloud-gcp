@@ -37,7 +37,7 @@ ssh dpsrv@dpsrv-$env bash <<_EOT_
 	[ -d dpsrv ] || mkdir dpsrv
 	cd dpsrv
 		
-	for repo in rc nginx certbot; do
+	for repo in rc nginx; do
 		[ ! -d \$repo ] || continue
 		git clone https://github.com/dpsrv/\$repo.git 
 		if grep -q openssl \$repo/.gitattributes; then
