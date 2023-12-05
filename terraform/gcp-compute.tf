@@ -1,46 +1,49 @@
 data "google_compute_network" "dpsrv" {
-	name = "default"
+  name = "default"
 }
 
 resource "google_compute_address" "dpsrv" {
-	name			= local.name
-	address_type	= "EXTERNAL"
+  name         = local.name
+  address_type = "EXTERNAL"
 }
 
 resource "google_compute_disk" "dpsrv" {
-	name	= "${local.name}-data"
-	type	= "pd-ssd"
-	zone	= local.zone
-	size	= 2
+  name = "${local.name}-data"
+  type = "pd-ssd"
+  zone = local.zone
+  size = 2
 
-	physical_block_size_bytes = 4096
+  physical_block_size_bytes = 4096
 }
 
 resource "google_compute_instance" "dpsrv" {
-	name			= local.name
-	machine_type	= "n1-standard-1"
-	zone			= local.zone
-	can_ip_forward = true
-	allow_stopping_for_update = true
-	boot_disk {
-		initialize_params {
-			image = "cos-cloud/cos-stable"
-			type = "pd-ssd"
-		}
-	}
+  name                      = local.name
+  machine_type              = "n1-standard-1"
+  zone                      = local.zone
+  can_ip_forward            = false
+  allow_stopping_for_update = true
 
-	network_interface {
-		network = data.google_compute_network.dpsrv.name
-		access_config {
-			nat_ip = google_compute_address.dpsrv.address
-		}
-	}
+  boot_disk {
+    initialize_params {
+      image = "cos-cloud/cos-stable"
+      type  = "pd-ssd"
+    }
+  }
 
-	metadata = {
-		 ssh-keys = "${local.sshUsername}:${local.sshKey}"
-	}
+  network_interface {
+    network = data.google_compute_network.dpsrv.name
+    access_config {
+      nat_ip = google_compute_address.dpsrv.address
+    }
+  }
 
-	metadata_startup_script = <<EOF
+  tags = [local.name]
+
+  metadata = {
+    ssh-keys = "${local.sshUsername}:${local.sshKey}"
+  }
+
+  metadata_startup_script = <<EOF
 #!/bin/bash -ex
 
 /sbin/iptables -A INPUT -p udp --dport 53 -j ACCEPT
@@ -64,34 +67,31 @@ fi
 
 EOF
 
-	lifecycle {
-		ignore_changes = [ attached_disk ]
-	}
+  lifecycle {
+    ignore_changes = [attached_disk]
+  }
 }
 
 resource "google_compute_attached_disk" "dpsrv" {
-	disk		= google_compute_disk.dpsrv.id
-	instance	= google_compute_instance.dpsrv.id
+  disk     = google_compute_disk.dpsrv.id
+  instance = google_compute_instance.dpsrv.id
 }
 
 resource "google_compute_firewall" "dpsrv" {
-	name	= local.name
-	network = data.google_compute_network.dpsrv.name
+  name    = local.name
+  network = data.google_compute_network.dpsrv.name
 
-	allow {
-		protocol = "icmp"
-	}
+  allow {
+    protocol = "udp"
+    ports    = ["53"]
+  }
 
-	allow {
-		protocol	= "udp"
-		ports		= [ "53" ]
-	}
+  allow {
+    protocol = "tcp"
+    ports    = ["53", "80", "443"]
+  }
 
-	allow {
-		protocol	= "tcp"
-		ports		= [ "22", "53", "80", "443" ]
-	}
-
-	source_tags = [ "dpsrv" ]
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = [local.name]
 }
 

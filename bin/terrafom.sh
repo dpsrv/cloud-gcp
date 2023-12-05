@@ -5,13 +5,12 @@ RWD=$PWD
 cd terraform
 
 action=$1
-env=$2
-if [ -z "$env" ]; then
-	echo "Usage: $0 <action> <env>"
+if [ -z "$action" ]; then
+	echo "Usage: $0 <action> [env [flags]]"
 	echo "e.g.: $0 plan dev"
 fi
 
-shift 2
+shift 
 
 function terraform() {
 	docker run -it \
@@ -21,6 +20,14 @@ function terraform() {
 		hashicorp/terraform:1.6 \
 		"$@"
 }
+
+if [ -z $1 ]; then
+	terraform "$action"
+	exit
+fi
+
+env=$1
+shift
 
 id=$env
 

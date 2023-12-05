@@ -1,5 +1,5 @@
-variable "name" { }
-variable "env" { }
-variable "region" { }
-variable "project" { }
-variable "zone" { }
+variable "name" {}
+variable "env" {}
+variable "region" {}
+variable "project" {}
+variable "zone" {}
