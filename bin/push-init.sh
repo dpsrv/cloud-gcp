@@ -46,4 +46,7 @@ ssh dpsrv@dpsrv-$env bash <<_EOT_
 	done
 
 	docker network ls|grep -q dpsrv || docker network create dpsrv
+
+	
+	echo 'export DPSRV_HOME=/mnt/disks/data/dpsrv/dpsrv' >> ~/.bash_profile
 _EOT_
