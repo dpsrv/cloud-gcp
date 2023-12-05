@@ -37,7 +37,7 @@ resource "google_compute_instance" "dpsrv" {
     }
   }
 
-  tags = [local.name]
+  tags = ["http-server","https-server"]
 
   metadata = {
     ssh-keys = "${local.sshUsername}:${local.sshKey}"
@@ -92,6 +92,5 @@ resource "google_compute_firewall" "dpsrv" {
   }
 
   source_ranges = ["0.0.0.0/0"]
-  target_tags   = [local.name]
 }
 

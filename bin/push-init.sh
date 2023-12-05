@@ -42,9 +42,9 @@ ssh dpsrv@dpsrv-$env bash <<_EOT_
 				cd -
 			fi
 		done
-
-		docker network ls|grep -q dpsrv || docker network create dpsrv
 	fi
+
+	docker network ls|grep -q dpsrv || docker network create dpsrv
 
 	if [ ! -f ~/.bash_profile ]; then
 		echo 'export PATH="\$PATH:/mnt/disks/data/\$LOGNAME/docker-scripts"' >> ~/.bash_profile
