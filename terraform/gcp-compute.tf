@@ -18,7 +18,7 @@ resource "google_compute_disk" "dpsrv" {
 
 resource "google_compute_instance" "dpsrv" {
   name                      = local.name
-  machine_type              = "n1-standard-1"
+  machine_type              = var.machine_type
   zone                      = local.zone
   can_ip_forward            = false
   allow_stopping_for_update = true
@@ -33,11 +33,12 @@ resource "google_compute_instance" "dpsrv" {
   network_interface {
     network = data.google_compute_network.dpsrv.name
     access_config {
+      network_tier = "PREMIUM"
       nat_ip = google_compute_address.dpsrv.address
     }
   }
 
-  tags = ["http-server","https-server"]
+  tags = ["http-server", "https-server", "lb-health-check"]
 
   metadata = {
     ssh-keys = "${local.sshUsername}:${local.sshKey}"
@@ -88,9 +89,10 @@ resource "google_compute_firewall" "dpsrv" {
 
   allow {
     protocol = "tcp"
-    ports    = ["53", "80", "443"]
+    ports    = ["53","80","443"]
   }
 
   source_ranges = ["0.0.0.0/0"]
+  target_tags = ["http-server","https-server","lb-health-check"]
 }
 

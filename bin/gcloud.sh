@@ -1,4 +1,4 @@
-#!/opt/local/bin/bash -ex
+#!/opt/local/bin/bash -e
 
 SWD=$(cd $(dirname $0); pwd)
 
