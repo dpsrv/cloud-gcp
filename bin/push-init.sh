@@ -49,4 +49,5 @@ ssh dpsrv@dpsrv-$env bash <<_EOT_
 
 	
 	echo 'export DPSRV_HOME=/mnt/disks/data/dpsrv/dpsrv' >> ~/.bash_profile
+	echo 'export DOCKER_MNT=\$DPSRV_HOME' >> ~/.bash_profile
 _EOT_
