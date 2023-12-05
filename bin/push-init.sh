@@ -15,25 +15,33 @@ _EOT_
 scp -r ~/.config/git/ dpsrv@dpsrv-$env:.config/
 
 ssh dpsrv@dpsrv-$env bash <<_EOT_
+	set -ex
 
-	cd /mnt/disks/data/opt
-	if [ ! -d git-openssl-secrets ]; then
-		git clone https://github.com/maxfortun/git-openssl-secrets.git
-		cd git-openssl-secrets
-		ln -s git-setenv-openssl-secrets-fs.sh git-setenv-openssl-secrets.sh
-		cd $OLDPWD
-	fi
+	[ ! -d /mnt/disks/data/\$LOGNAME ] || exit 0
 
-	[ -d dpsrv ] || mkdir dpsrv
+	sudo mkdir /mnt/disks/data/\$LOGNAME
+	sudo chown -R \$LOGNAME:\$LOGNAME /mnt/disks/data/\$LOGNAME
+	cd /mnt/disks/data/\$LOGNAME
+
+	git clone https://github.com/maxfortun/docker-scripts.git
+	echo 'export PATH="\$PATH:/mnt/disks/data/\$LOGNAME/docker-scripts"' >> ~/.bash_profile
+
+	git clone https://github.com/maxfortun/git-openssl-secrets.git
+	cd git-openssl-secrets
+	ln -s git-setenv-openssl-secrets-fs.sh git-setenv-openssl-secrets.sh
+	cd -
+	echo 'export PATH="\$PATH:/mnt/disks/data/\$LOGNAME/git-openssl-secrets"' >> ~/.bash_profile
+
+	mkdir dpsrv
 	cd dpsrv
 	
 	for repo in rc nginx; do
-		[ ! -d $repo ] || continue
-		git clone https://github.com/dpsrv/$repo.git 
-		if grep -q openssl $repo/.gitattributes; then
-			cd $repo
-			/mnt/disks/data/opt/git-openssl-secret/git-init-openssl-secrets.sh
-			cd $OLDPWD
+		[ ! -d \$repo ] || continue
+		git clone https://github.com/dpsrv/\$repo.git 
+		if grep -q openssl \$repo/.gitattributes; then
+			cd \$repo
+			/mnt/disks/data/\$LOGNAME/git-openssl-secrets/git-init-openssl-secrets.sh
+			cd -
 		fi
 	done
 

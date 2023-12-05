@@ -20,6 +20,7 @@ resource "google_compute_instance" "dpsrv" {
 	name			= local.name
 	machine_type	= "n1-standard-1"
 	zone			= local.zone
+	can_ip_forward = true
 	allow_stopping_for_update = true
 	boot_disk {
 		initialize_params {
@@ -40,7 +41,7 @@ resource "google_compute_instance" "dpsrv" {
 	}
 
 	metadata_startup_script = <<EOF
-#!/bin/bash -e
+#!/bin/bash -ex
 
 /sbin/iptables -A INPUT -p udp --dport 53 -j ACCEPT
 /sbin/iptables -A INPUT -p tcp --dport 53 -j ACCEPT
@@ -60,17 +61,6 @@ if ! grep -qs '/mnt/disks/data ' /proc/mounts; then
 	echo "Mounting disk"
 	mount -o discard,defaults /dev/sdb /mnt/disks/data
 fi
-
-if [ ! -d /mnt/disks/data/opt ]; then
-	mkdir /mnt/disks/data/opt
-	cd /mnt/disks/data/opt
-
-	git clone https://github.com/maxfortun/docker-scripts.git
-
-	cd $OLDPWD
-fi
-
-echo 'export PATH="$PATH:/mnt/disks/data/opt/docker-scripts"' >> ~dpsrv/.bashrc
 
 EOF
 
